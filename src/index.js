@@ -102,6 +102,7 @@ const Keyboard = {
 
     this.elements.main.append(this.elements.keysContainer);
     this.elements.keysContainer.append(this._createKeys());
+    this._createKeyboardListener();
 
     return this.elements.main;
   },
@@ -220,6 +221,77 @@ const Keyboard = {
     })
 
     return fragment;
+  },
+
+  _createKeyboardListener() {
+    window.addEventListener('keydown', (e) => {
+      if (e.metaKey) {
+        return;
+      }
+      
+      if (e.altKey && e.ctrlKey) {
+        this._toggleLang();
+      }
+
+      if (e.shiftKey) {
+        if (!this.properties.isShifted) {
+          this.elements.keysContainer.querySelectorAll('.case').forEach(k => k.classList.toggle('off'));
+        }
+        !this.properties.isShifted ? this.properties.isShifted = true : false;
+      }
+
+      e.preventDefault();
+
+      switch (e.code) {
+        case 'Backspace':
+          textArea.value = textArea.value.slice(0, -1);
+          break;
+        case 'Tab':
+          textArea.value += '\t';
+          break;
+        case 'CapsLock':
+          this._toggleCapsLock();
+          break;
+        case 'Space':
+          textArea.value += ' ';
+          break;
+        case 'Enter':
+          textArea.value += '\n';
+          break;
+        case 'ShiftLeft':
+          break;
+        case 'ShiftRight':
+          break;
+        case 'AltLeft':
+          break;
+        case 'AltRight':
+          break;
+        case 'ControlLeft':
+          break;
+        case 'ControlRight':
+          break;
+        default:
+          if (this.properties.langEng && !this.properties.capsLock) {
+            e.shiftKey ? textArea.value += this.elements.keys[e.code][2] : textArea.value += this.elements.keys[e.code][0];
+          } else if (!this.properties.langEng && !this.properties.capsLock) {
+            e.shiftKey ? textArea.value += this.elements.keys[e.code][3] : textArea.value += this.elements.keys[e.code][1];
+          } else if (this.properties.langEng && this.properties.capsLock) {
+            e.shiftKey ? textArea.value += this.elements.keys[e.code][0] : textArea.value += this.elements.keys[e.code][2];
+          } else {
+            e.shiftKey ? textArea.value += this.elements.keys[e.code][1] : textArea.value += this.elements.keys[e.code][3];
+          }
+          break;
+      }
+    })
+
+    window.addEventListener('keyup', (e) => {
+      if (!e.shiftKey && e.key === 'Shift') {
+        if (this.properties.isShifted) {
+          this.elements.keysContainer.querySelectorAll('.case').forEach(k => k.classList.toggle('off'));
+        }
+        this.properties.isShifted ? this.properties.isShifted = false : false;
+      }
+    })
   },
 
   _toggleCapsLock() {
