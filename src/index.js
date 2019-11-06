@@ -124,8 +124,100 @@ const Keyboard = {
       keyElement.insertAdjacentHTML('beforeend', keyElementInner);
       keyElement.classList.add('key', k);
 
+      keyElement.addEventListener('click', () => {
+        keyElement.classList.add('key-pressed');
+        setTimeout(() => keyElement.classList.remove('key-pressed'), 100);
+      });
+
+      switch (k) {
+        case 'Backspace':
+          keyElement.addEventListener('click', () => {
+            textArea.value = textArea.value.slice(0, -1);
+          });
+          break;
+        case 'Tab':
+          keyElement.addEventListener('click', () => {
+            textArea.value += '\t';
+          });
+          break;
+        case 'CapsLock':
+          keyElement.addEventListener('click', () => {
+            this._toggleCapsLock();
+          });
+          break;
+        case 'Enter':
+          keyElement.addEventListener('click', () => {
+            textArea.value += '\n';
+          });
+          break;
+        case 'Space':
+          keyElement.addEventListener('click', () => {
+            textArea.value += ' ';
+          });
+          break;
+        case 'ShiftLeft':
+          break;
+        case 'ShiftRight':
+          break;
+        case 'AltLeft':
+          keyElement.addEventListener('click', (e) => {
+            e.ctrlKey ? this._toggleLang() : false;
+          });
+          break;
+        case 'ChangeLang':
+          keyElement.addEventListener('click', (e) => {
+            this._toggleLang()
+          });
+          break;
+        case 'AltRight':
+          keyElement.addEventListener('click', (e) => {
+            e.ctrlKey ? this._toggleLang() : false;
+          });
+          break;
+        case 'ControlLeft':
+          keyElement.addEventListener('click', (e) => {
+            e.altKey ? this._toggleLang() : false;
+          });
+          break;
+        case 'ControlRight':
+          keyElement.addEventListener('click', (e) => {
+            e.altKey ? this._toggleLang() : false;
+          });
+          break;
+        case 'MetaLeft':
+          break;
+        default:
+          keyElement.addEventListener('click', (e) => {
+            if (this.properties.langEng && !this.properties.capsLock) {
+              e.shiftKey ? textArea.value += kboard[k][2] : textArea.value += kboard[k][0];
+            } else if (!this.properties.langEng && !this.properties.capsLock) {
+              e.shiftKey ? textArea.value += kboard[k][3] : textArea.value += kboard[k][1];
+            } else if (this.properties.langEng && this.properties.capsLock) {
+              e.shiftKey ? textArea.value += kboard[k][0] : textArea.value += kboard[k][2];
+            } else {
+              e.shiftKey ? textArea.value += kboard[k][1] : textArea.value += kboard[k][3];
+            }
+          });
+          break;
+      }
       fragment.append(keyElement);
     }
+
+    window.addEventListener('keydown', (e) => {
+      this.elements.keysContainer.querySelectorAll('.key').forEach(k => {
+        if (k.classList.contains(e.code)) {
+          k.classList.add('key-pressed');
+        }
+      })
+    })
+
+    window.addEventListener('keyup', (e) => {
+      this.elements.keysContainer.querySelectorAll('.key').forEach(k => {
+        if (k.classList.contains(e.code)) {
+          k.classList.remove('key-pressed');
+        }
+      })
+    })
 
     return fragment;
   },
